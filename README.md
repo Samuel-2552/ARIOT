@@ -1,5 +1,5 @@
 # ARIOT
-AR and IoT enabled Device
+AR and IoT enabled Device using Unity and Vuforia Engine.
 
 # Try it Out!
 You can try out our apk and see the result.
