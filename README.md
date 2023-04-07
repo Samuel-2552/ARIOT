@@ -1,5 +1,9 @@
 # ARIOT
 AR and IoT enabled Device
 
+#Try it Out!
+You can try out our apk and see the result.
+The traget image is added in the repo wiht name 'Target_Img'. When camera detects it the AR buttons appear virtually.
+
 # Sample Images
 ![image](https://user-images.githubusercontent.com/104893913/230516486-f3af6811-537c-490f-b4e7-dba1f3aeb961.png)
