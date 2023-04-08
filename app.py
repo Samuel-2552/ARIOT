@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, Response
 import os
 import cv2
+no_cameras=1
 
 app = Flask(__name__)
 
@@ -10,6 +11,7 @@ def home():
 
 @app.route('/camera', methods=['GET', 'POST'])
 def camera():
+    global no_cameras
     if request.method == 'POST':
         no_cameras = int(request.form.get('no-cameras'))
         for i in range(1, no_cameras+1):
@@ -35,23 +37,33 @@ def feed(no_cameras):
     return render_template('feed.html', camera_cards=camera_cards)
 
 def gen_frames():
-    cap = cv2.VideoCapture(0)
+    global no_cameras
+    capture_objects = []
+    for i in range(no_cameras):
+        cap = cv2.VideoCapture(i)
+        capture_objects.append(cap)
+
     while True:
-        # replace "http://ip_address:port/video" with your DroidCam IP address and port
-        # cap = cv2.VideoCapture(0)
+        frames = []
+        for cap in capture_objects:
+            success, frame = cap.read()
+            if not success:
+                break
+            else:
+                ret, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                frames.append(frame)
 
-        success, frame = cap.read()
-
-        if not success:
-            break
+        if len(frames) == no_cameras:
+            yield b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frames[0] + b'\r\n'
+            for i in range(1, no_cameras):
+                yield b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + frames[i] + b'\r\n'
         else:
-            ret, buffer = cv2.imencode('.jpg', frame)
-            print(ret)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            break
 
-    cap.release()
+    for cap in capture_objects:
+        cap.release()
+
 
 @app.route('/video_feed')
 def video_feed():
