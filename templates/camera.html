@@ -116,6 +116,7 @@
 					const xhr = new XMLHttpRequest();
 					xhr.open('POST', '/camera');
 					xhr.send(formData);
+					window.location.href="/feed/"+cnt;
 					console.log("Upload");
 					console.log(formData.toString());
 			}
