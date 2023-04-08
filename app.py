@@ -35,10 +35,10 @@ def feed(no_cameras):
     return render_template('feed.html', camera_cards=camera_cards)
 
 def gen_frames():
-    # cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(0)
     while True:
         # replace "http://ip_address:port/video" with your DroidCam IP address and port
-        cap = cv2.VideoCapture(0)
+        # cap = cv2.VideoCapture(0)
 
         success, frame = cap.read()
 
@@ -51,7 +51,7 @@ def gen_frames():
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-        cap.release()
+    cap.release()
 
 @app.route('/video_feed')
 def video_feed():
