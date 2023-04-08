@@ -5,7 +5,7 @@
 	<!-- Bootstrap CSS -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 	<!-- Custom CSS -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='camera.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 	<div class="container mt-5">
@@ -15,7 +15,7 @@
 				<h4>{{ camera_card.title }}</h4>
 			</div>
 			<div class="card-body">
-				<img src="{{ camera_card.image_path }}" class="img-fluid">
+				<img src="{{ url_for('video_feed') }}" class="img-fluid">
 			</div>
 		</div>
 		{% endfor %}

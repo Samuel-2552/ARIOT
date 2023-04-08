@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>Select Number of Cameras</title>
 	<!-- Bootstrap CSS -->
@@ -14,15 +15,18 @@
 			from {
 				opacity: 0;
 			}
+
 			to {
 				opacity: 1;
 			}
 		}
+
 		.card-custom {
 			animation: fadeIn 1s ease-in-out;
 		}
 	</style>
 </head>
+
 <body>
 	<div class="container mt-5">
 		<div class="card">
@@ -47,54 +51,78 @@
 		<div id="camera-cards" class="mt-3 d-none">
 			<!-- Camera cards will be dynamically generated here -->
 		</div>
+		<button id="submit-images" type="button" class="btn btn-primary"
+			style="padding:10px; margin-top:10px; cursor:not-allowed;" disabled>Submit</button>
 	</div>
 	<script>
 		// When the camera form is submitted
-$("#camera-form").submit(function(event) {
-    // Prevent default form submission
-    event.preventDefault();
-    // Get the selected number of cameras
-    var noCameras = $("#no-cameras").val();
-    // Generate camera cards based on the selected number of cameras
-    var cameraCards = "";
-    for (var i = 1; i <= noCameras; i++) {
-        cameraCards += '<div class="card card-custom mt-3">';
-        cameraCards += '<div class="card-header bg-info text-white">';
-        cameraCards += '<h4>Camera ' + i + '</h4>';
-        cameraCards += '</div>';
-        cameraCards += '<div class="card-body">';
-        cameraCards += '<form id="camera-form-' + i + '">';
-        cameraCards += '<div class="form-group">';
-        cameraCards += '<label for="camera-' + i + '">Upload Image:</label>';
-        cameraCards += '<input type="file" class="form-control-file" id="camera-' + i + '" name="camera-' + i + '" onchange="displayImage(' + i + ')">';
-        cameraCards += '</div>';
-        cameraCards += '<div id="image-preview-' + i + '" class="d-none"></div>';
-        cameraCards += '</form>';
-        cameraCards += '</div>';
-        cameraCards += '</div>';
-    }
-    // Show the camera cards and remove the camera selection form
-    $("#camera-cards").html(cameraCards);
-    $("#camera-cards").removeClass("d-none");
-});
+		$("#camera-form").submit(function (event) {
+			// Prevent default form submission
+			event.preventDefault();
+			// Get the selected number of cameras
+			var noCameras = $("#no-cameras").val();
+			// Generate camera cards based on the selected number of cameras
+			var cameraCards = "";
+			for (var i = 1; i <= noCameras; i++) {
+				cameraCards += '<div class="card card-custom mt-3">';
+				cameraCards += '<div class="card-header bg-info text-white">';
+				cameraCards += '<h4>Camera ' + i + '</h4>';
+				cameraCards += '</div>';
+				cameraCards += '<div class="card-body">';
+				cameraCards += '<form id="camera-form-' + i + '">';
+				cameraCards += '<div class="form-group">';
+				cameraCards += '<label for="camera-' + i + '">Upload Image:</label>';
+				cameraCards += '<input type="file" class="form-control-file" id="camera-' + i + '" name="camera-' + i + '" onchange="displayImage(' + i + ')">';
+				cameraCards += '</div>';
+				cameraCards += '<div id="image-preview-' + i + '" class="d-none"></div>';
+				cameraCards += '</form>';
+				cameraCards += '</div>';
+				cameraCards += '</div>';
+			}
+			document.getElementById("submit-images").disabled = false;
+			document.getElementById("submit-images").style.cursor = 'pointer';
+			// Show the camera cards and remove the camera selection form
+			$("#camera-cards").html(cameraCards);
+			$("#camera-cards").removeClass("d-none");
+		});
 
-// Function to display selected image
-function displayImage(cameraIndex) {
-    // Get the selected image file
-    var file = $("#camera-" + cameraIndex)[0].files[0];
-    // Create a new FileReader object
-    var reader = new FileReader();
-    // Set the image preview on load
-    reader.onload = function() {
-        var imagePreview = '<img src="' + reader.result + '" width=50px height=auto class="img-fluid">';
-        var imageCaption = '<p>Selected image: ' + file.name + '</p>';
-        $("#image-preview-" + cameraIndex).html(imagePreview + imageCaption);
-        $("#image-preview-" + cameraIndex).removeClass("d-none");
-    }
-    // Read the selected image file as a data URL
-    reader.readAsDataURL(file);
-}
+		// Function to display selected image
+		function displayImage(cameraIndex) {
+			// Get the selected image file
+			var file = $("#camera-" + cameraIndex)[0].files[0];
+			// Create a new FileReader object
+			var reader = new FileReader();
+			// Set the image preview on load
+			reader.onload = function () {
+				var imagePreview = '<img src="' + reader.result + '" width=50px height=auto class="img-fluid">';
+				var imageCaption = '<p>Selected image: ' + file.name + '</p>';
+				$("#image-preview-" + cameraIndex).html(imagePreview + imageCaption);
+				$("#image-preview-" + cameraIndex).removeClass("d-none");
+			}
+			// Read the selected image file as a data URL
+			reader.readAsDataURL(file);
+		}
 
-</script>
+		document.getElementById("submit-images").addEventListener("click", function () {
+			var cnt = document.getElementById("no-cameras").value;
+			for (var i = 1; i <= cnt; i++) {
+				const fileInput = document.querySelector('#camera-' + i);
+				const submitButton = document.querySelector('#submit-images');
+					const file = fileInput.files[0];
+					const formData = new FormData();
+					formData.append('camera-'+i, file);
+					console.log(i)
+					formData.append('no-cameras',cnt);
+					const xhr = new XMLHttpRequest();
+					xhr.open('POST', '/camera');
+					xhr.send(formData);
+					console.log("Upload");
+					console.log(formData.toString());
+			}
+		});
+
+
+	</script>
 </body>
+
 </html>
