@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Camera Feed</title>
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='camera.css') }}">
+</head>
+<body>
+	<div class="container mt-5">
+		{% for camera_card in camera_cards %}
+		<div class="card">
+			<div class="card-header bg-info text-white">
+				<h4>{{ camera_card.title }}</h4>
+			</div>
+			<div class="card-body">
+				<img src="{{ camera_card.image_path }}" class="img-fluid">
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</body>
+</html>

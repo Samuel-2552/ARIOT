@@ -1,28 +1,37 @@
-from flask import Flask, render_template, Response
-import cv2
+from flask import Flask, render_template, request, redirect, url_for
+import os
 
 app = Flask(__name__)
 
-camera = cv2.VideoCapture(0)  # Initialize camera object
+@app.route('/')
+def home():
+    return render_template('home.html')
 
-def gen_frames():  # Generate camera frames
-    while True:
-        success, frame = camera.read()  # Read camera frames
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)  # Encode camera frame as JPEG image
-            frame = buffer.tobytes()  # Convert encoded frame to bytes
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # Yield camera frame
+@app.route('/camera', methods=['GET', 'POST'])
+def camera():
+    if request.method == 'POST':
+        no_cameras = int(request.form['no-cameras'])
+        for i in range(1, no_cameras+1):
+            if f'camera-{i}' not in request.files:
+                continue
+            file = request.files[f'camera-{i}']
+            if file.filename == '':
+                continue
+            filename = f'camera-{i}-{file.filename}'
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return redirect(url_for('feed', no_cameras=no_cameras))
+    return render_template('camera.html')
 
-@app.route('/')  # Route for home page
-def index():
-    return render_template('video.html')
-
-@app.route('/video_feed')  # Route for camera feed
-def video_feed():
-    return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/feed/<int:no_cameras>')
+def feed(no_cameras):
+    camera_cards = []
+    for i in range(1, no_cameras+1):
+        camera_cards.append({
+            'title': f'Camera {i}',
+            'image_path': os.path.join(app.config['UPLOAD_FOLDER'], f'camera-{i}-' + os.listdir(app.config['UPLOAD_FOLDER'])[i-1]),
+        })
+    return render_template('feed.html', camera_cards=camera_cards)
 
 if __name__ == '__main__':
+    app.config['UPLOAD_FOLDER'] = 'uploads'
     app.run(debug=True)
